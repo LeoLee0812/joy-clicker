@@ -488,7 +488,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             say("\(pad.side) 按下 \(describe(btns))")
             return
         }
-        guard canSend() else { return }
+        // debug 级不落盘，排查「按了没反应」时用 /usr/bin/log stream --level debug 看
+        let ok = canSend()
+        logger.debug("\(pad.side, privacy: .public) 按下 \(describe(btns), privacy: .public)\(ok ? "" : "，没发键（暂停 / 没权限 / Glint 在前台）", privacy: .public)")
+        guard ok else { return }
         for (b, act) in keymap where btns.contains(b) {
             switch act {
             case .key(let k, let f):

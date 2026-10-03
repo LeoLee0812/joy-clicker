@@ -52,7 +52,7 @@ WPS、PowerPoint、Keynote、Google 幻灯片、预览（PDF）、reveal.js 这�
 - **手柄上亮几格灯，就是还剩几格电**。玩家指示灯拿来当电量格用，没电时第 1 格会闪。
 - 手柄连上时会震两下，表示已经可以用了。
 - 菜单栏图标是实心的表示手柄在线，空心表示没连上，变灰表示已暂停或者还没给权限。点开菜单可以看电量、暂停翻页、开关开机自启。
-- 讲一页讲很久也不怕手柄睡着：最后一次按键后 30 分钟内一直保活。要改时长就运行 `defaults write com.leo.joyclicker keepAliveMinutes -float 60`，设成 0 是关掉。
+- 讲一页讲很久也不怕手柄睡着：最后一次按键后 30 分钟内，每 2 秒给手柄发一帧空震动保活。实测不保活也能连着 15 分钟以上，这只是多一层保险。要改时长就运行 `defaults write com.leo.joyclicker keepAliveMinutes -float 60`，设成 0 是关掉。
 - 作者自己的眼动阅读器 Glint 也会直接读 Joy-Con。Glint 在前台时 JoyClicker 自动让开，Glint 在运行时 JoyClicker 不往手柄发任何指令。
 
 ## 安装
@@ -85,8 +85,10 @@ cd joy-clicker
 ```bash
 build/JoyClicker.app/Contents/MacOS/JoyClicker --probe      # 在终端里看按键事件，不发键，每分钟报一次电量和帧率
 build/JoyClicker.app/Contents/MacOS/JoyClicker --selftest   # 不连手柄，检查报告解析和按键映射对不对
-log stream --predicate 'subsystem == "com.leo.joyclicker"'  # 看连接、断开的日志
+/usr/bin/log stream --level debug --predicate 'subsystem == "com.leo.joyclicker"'  # 看连接、断开，以及每次按键有没有发出去
 ```
+
+> 要写全路径 `/usr/bin/log`：zsh 自带一个同名的 `log` 命令，直接敲 `log stream` 会报 too many arguments。
 
 ## 致谢
 
