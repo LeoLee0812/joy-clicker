@@ -398,7 +398,7 @@ final class JoyManager {
         pad.onStatus = { [weak self] in self?.onChange?() }
         pads[id] = pad
         pad.start()
-        logger.info("\(name, privacy: .public) 已连接")
+        logger.notice("\(name, privacy: .public) 已连接")
         onAttach?(pad)
         onChange?()
     }
@@ -406,7 +406,7 @@ final class JoyManager {
     private func detach(_ dev: IOHIDDevice) {
         guard let pad = pads.removeValue(forKey: key(dev)) else { return }
         pad.stop()
-        logger.info("\(pad.name, privacy: .public) 已断开")
+        logger.notice("\(pad.name, privacy: .public) 已断开")
         onDetach?(pad)
         onChange?()
     }
