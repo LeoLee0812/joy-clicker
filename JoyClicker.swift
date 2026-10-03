@@ -233,6 +233,19 @@ final class JoyCon {
         IOHIDDeviceRegisterInputReportCallback(device, buffer, 512, nil, nil)
     }
 
+    /// 退出前同步切回简单模式 0x3F：不然手柄会一直 60Hz 发全量报告，白白耗电
+    func restoreSimpleMode() {
+        guard !glintRunning() else { return }
+        stop()
+        var r = [UInt8](repeating: 0, count: 49)
+        r[0] = 0x01
+        r[1] = packet & 0x0F
+        r.replaceSubrange(2..<10, with: quietFrame + quietFrame)
+        r[10] = 0x03
+        r[11] = 0x3F
+        _ = IOHIDDeviceSetReport(device, kIOHIDReportTypeOutput, CFIndex(r[0]), r, r.count)
+    }
+
     private func initialize() {
         lastInit = uptime()
         shownLED = 0xFF
@@ -457,6 +470,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             }
         }
         refresh()
+    }
+
+    func applicationWillTerminate(_ note: Notification) {
+        for pad in pads.all { pad.restoreSimpleMode() }
     }
 
     // MARK: 按键 → 动作
